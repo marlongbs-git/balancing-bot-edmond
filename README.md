@@ -126,9 +126,6 @@ STEP and STL exports are in [`mechanical/`](mechanical/).
 - Steve Brunton's Control Bootcamp (control and state-space modeling lectures), *Data Driven Science & Engineering
   Machine Learning, Dynamical Systems, and Control* 
 - Beard and McLain, *Small Unmanned Aircraft* (attitude estimation)
-- Brian Douglas's ...
+- Brian Douglas (Discrete Control Theory)
 - SSD1306 Files from [afiskon/stm32-ssd1306](https://github.com/afiskon/stm32-ssd1306) for OLED Drivers and face from [mjyc/table-robot-face](https://github.com/mjyc/tablet-robot-face)
 
-## License
-
-MIT for code. Mechanical files and docs under CC BY 4.0.
