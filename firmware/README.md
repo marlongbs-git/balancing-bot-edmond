@@ -17,22 +17,9 @@ STM32CubeIDE project for the self-balancing robot (STM32F303K8, Nucleo-32). C on
 ## Overview
 
 The main loop does the same thing every cycle:
-
-```
-read IMU ─► complementary filter ─► θ, θ̇
-read encoder ─► x, ẋ
-             │
-             ▼
-     RobotState (one struct)
-             │
-   tipped? ──┼── yes ─► motors off, fallen face
-             │
-             no
-             ▼
-   u = -K·[x ẋ θ θ̇]ᵀ        computeControlEffort()
-   duty = f(u, v, supply)      computeControlDuty()
-   write PWM + direction       setPWMControl()
-```
+<p align="center">
+<img width="590" height="584" alt="firmware_decision" src="https://github.com/user-attachments/assets/3ca8ad0f-00cb-4de5-8e72-8e62e50f0449" />
+</p>
 
 ## Modules
 
