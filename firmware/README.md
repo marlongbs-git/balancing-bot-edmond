@@ -89,9 +89,11 @@ Peripheral summary (see [`../electronics/pinout.md`](../electronics/pinout.md) f
 
 ## Running and tuning
 
-1. Power up with the robot held upright and still. The gyro offset is calibrated at startup.
-2. Release it. It should hold itself near vertical.
-3. Gains are set in one place via `setControlGains(...)`. Regenerate K in `matlab/` and paste the new values.
+1. Flash new robot code with the USB connected exclusively.
+2. Remove USB Connector.
+3. Power up with the robot held upright and still. The gyro offset is calibrated at startup.
+4. Release it. It should hold itself near vertical.
+5. Gains are set in one place via `setControlGains(...)`. Regenerate K in `matlab/` and paste the new values.
 
 LQR tuning intuition: `Q` penalizes state error, `R` penalizes motor effort, and only their ratio matters. Raising the θ and θ̇ weights makes the robot react harder to tilt. Raising `R` makes it gentler and slower.
 
