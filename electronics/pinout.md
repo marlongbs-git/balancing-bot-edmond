@@ -61,7 +61,7 @@ DC supply 7.1V ────────────────► motor driver 
 
 ## Wiring notes
 
-- Soldered connections only. Breadboard jumpers and cheap headers caused intermittent I2C failures (acknowledge failures and arbitration-lost errors) until they were replaced.
+- Soldered connections only for Buck Converter and IMU. Vibrations from movement and cheap headers caused I2C Failure for the sensor (acknowledge failures and arbitration-lost errors).
 - Keep the I2C wires short and away from the motor wires.
 - If the bus ever locks up, the firmware runs a bus-recovery routine (toggle SCL up to 9 times, send a STOP, re-initialize the peripheral).
 
