@@ -121,9 +121,3 @@ LQR tuning intuition: `Q` penalizes state error, `R` penalizes motor effort, and
 - No driving command yet; the controller only holds the upright position.
 - Complementary filter only; an EKF is on the roadmap.
 
-<!--
-TODO before publishing:
-- Confirm baud rate and tilt threshold values.
-- Confirm gyro calibration cancels the offset (omega should read ~0 at rest).
-- Make sure the L and I values in matlab/ match the Y rotation axis (L ≈ 0.0656 m, Iyy ≈ 0.00172 kg·m²).
--->
