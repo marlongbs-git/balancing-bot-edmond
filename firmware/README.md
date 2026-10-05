@@ -69,6 +69,18 @@ If `|θ|` exceeds the tilt threshold, `state.tipped` is set, PWM goes to zero an
 #define RECOVERY_THRESHOLD_DEGREES 5.0f
 ```
 
+```c
+static bool checkFallDetection(float thetaDeg) {
+	static bool tippedLatch = false;
+
+	if(!tippedLatch && fabs(thetaDeg) > FALL_THRESHOLD_DEGREES){
+		tippedLatch = true;
+	}else if (tippedLatch && fabs(thetaDeg) < RECOVERY_THRESHOLD_DEGREES){
+		tippedLatch = false;
+	}
+	return tippedLatch;
+}
+```
 ## Setup and build
 
 **Requirements:** STM32CubeIDE, an ST-LINK (built into the Nucleo), a serial terminal.
