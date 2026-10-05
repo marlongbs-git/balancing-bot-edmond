@@ -73,7 +73,7 @@ DC supply 7.1V ────────────────► motor driver 
 | MPU6050 breakout | 1 | I2C IMU |
 | DFRobot FIT0450 geared DC motor with encoder | 2 | 120:1 gearbox |
 | DFRobot DRI0002 dual motor driver | 1 | L298N-based |
-| 0.96" SSD1306 I2C OLED, 128x64 | 1 | Robot face |
+| 0.96" SSD1306 I2C OLED, 128x64 | 1 | I2C OLED Robot face |
 | 5 V buck converter (MPM3610 breakout) | 1 | 6-21 V in, 1.2 A out |
 | Perfboard, wire, headers | - | Soldered build |
 
