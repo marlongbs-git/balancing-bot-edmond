@@ -71,6 +71,10 @@ See [`firmware/`](firmware/) for build instructions.
 ## Electronics
 
 Pin assignments and wiring live in [`electronics/pinout.md`](electronics/pinout.md).
+<p align="center">
+<img width="333" height="358" alt="edmond_electronicsbringup" src="https://github.com/user-attachments/assets/4c21a2d2-5324-4838-9c20-1dbf5a6c9c3a" />
+</p>
+
 
 - The MPU6050 and OLED share one I2C bus (different addresses).
 - The robot is powered from a single supply through a 5 V buck converter into the Nucleo.
@@ -121,7 +125,7 @@ STEP and STL exports are in [`mechanical/`](mechanical/).
 
 - Phil's Lab (STM32 implementation and digital filter tutorials)
 - Steve Brunton's Control Bootcamp (control and state-space modeling lectures), *Data Driven Science & Engineering
-Machine Learning, Dynamical Systems, and Control* 
+  Machine Learning, Dynamical Systems, and Control* 
 - Beard and McLain, *Small Unmanned Aircraft* (attitude estimation)
 - SSD1306 Files from [afiskon/stm32-ssd1306](https://github.com/afiskon/stm32-ssd1306) for OLED Drivers and face from [mjyc/table-robot-face](https://github.com/mjyc/tablet-robot-face)
 
