@@ -1,0 +1,73 @@
+# ======================================================
+# STM32CubeIDE / CubeMX build output
+# ======================================================
+Debug/
+Release/
+build/
+*.elf
+*.bin
+*.hex
+*.map
+*.list
+*.o
+*.d
+*.su
+*.cyclo
+*.a
+
+# IDE workspace state (per-machine, not part of the project)
+.metadata/
+.settings/
+*.launch
+.mxproject
+
+# Optional: skip the generated HAL/CMSIS libraries (~tens of MB).
+# Anyone can regenerate them by opening the .ioc in CubeMX/CubeIDE.
+# Uncomment if you want a smaller repo; leave commented if you want
+# the project to build with no extra steps.
+# Drivers/
+# Middlewares/
+
+# ======================================================
+# MATLAB / Simulink
+# ======================================================
+*.asv
+*.autosave
+*.m~
+*.mex*
+*.slxc
+*.slx.autosave
+*.slx.r*
+*.slx.original
+*.mdl.r*
+slprj/
+codegen/
+sl_proj_cache/
+*.mat
+!matlab/**/*_params.mat
+
+# ======================================================
+# SolidWorks
+# ======================================================
+# Lock / temp files created while a document is open
+~$*
+*.tmp
+*.bak
+*.swp
+
+# ======================================================
+# OS and editor junk
+# ======================================================
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.log
+
+# ======================================================
+# Personal scratch (keep out of the public repo)
+# ======================================================
+scratch/
+private/
+notes_raw/
