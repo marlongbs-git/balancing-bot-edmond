@@ -105,8 +105,9 @@ LQR tuning intuition: `Q` penalizes state error, `R` penalizes motor effort, and
 
 ## Known limitations
 
-- Only one encoder is wired, so position and velocity come from a single wheel.
-- No battery operation yet (bench supply plus 5 V buck converter).
+- Only one encoder is wired, so position and velocity come from a single wheel and assumed the same.
+- No battery operation yet (bench supply at 7.1 V fed to a 5 V buck converter).
 - No driving command yet; the controller only holds the upright position.
 - Complementary filter only; an EKF is on the roadmap.
+- Motor will quickly saturate after prolonged operation for best performance only operate at small intervals.
 
