@@ -45,7 +45,6 @@ Every control cycle the firmware:
 ## Repository layout
 
 ```
-.
 ├── firmware/       STM32CubeIDE project (.ioc, Core/Src, Core/Inc)
 ├── electronics/    Pinout, wiring diagram, bill of materials
 ├── matlab/         Plant model, LQR design, Simulink model
