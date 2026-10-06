@@ -41,6 +41,7 @@ Two metric sizes are used throughout:
 |---|---|
 | **M3** | Structural joints, motor mounting, wheel and leg hardware |
 | **M2** | Small electronics mounts: perfboard, OLED, sensor board |
+| **M3 Heat-Set Inserts** | Leg and Head Interfacing
 
 Using only two sizes keeps the build simple: a single hex key and screwdriver set, and no mixing of thread standards.
 
