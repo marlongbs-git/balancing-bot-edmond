@@ -92,7 +92,7 @@ The plant is modeled as a cart-pendulum with the wheels as the cart and the chas
 - **Weights:** `Q` penalizes angle and angular rate much more than position; `R` penalizes motor effort.
 - **Physical parameters** (masses, center of mass, inertia) come from the SolidWorks mass-properties report.
 
-Details and the derivation are in [`matlab/`](matlab/) and [`docs/control-design.md`](docs/control-design.md).
+Details and the derivation are in [`matlab/`](matlab/)
 
 ## Mechanical design
 
