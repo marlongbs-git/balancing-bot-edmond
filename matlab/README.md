@@ -1,3 +1,4 @@
+
 # MATLAB / Simulink: model and LQR design
 
 Everything needed to go from the robot's CAD mass properties to the gain vector `Kdlqr` that runs on the STM32.
@@ -73,6 +74,9 @@ Sanity check: setting `I = 0` collapses this to Brunton's point-mass cart-pendul
 ## Getting the inertia out of SolidWorks
 
 The inertia is computed in CAD, not guessed.
+<p align = "center" > 
+<img width="511" height="687" alt="robot_coordinatesystem" src="https://github.com/user-attachments/assets/b31b7886-3b78-4f1e-ba1b-3693fbca8d8a" />
+</p>
 
 1. Put a **coordinate system at the wheel axle**, with its **X axis along the axle**. The robot tips about this X axis.
 2. Open **Evaluate → Mass Properties** and set *Report coordinate values relative to* to that coordinate system.
@@ -105,6 +109,9 @@ Steps in the script:
 5. `[Kdlqr, Ks, Kp] = dlqr(F, G, Q, R)`, applied directly to the **discrete** system. (`lqr` on the continuous model is also computed, only for comparison.)
 6. Verify stability: all eigenvalues of `F − G·Kdlqr` must have magnitude < 1.
 
+<p align = "center">
+<img width="487" height="204" alt="continous2discrete" src="https://github.com/user-attachments/assets/bce33a40-f95f-4f87-a555-a6be9f97afa0" />
+</p>
 ## Results
 
 Closed-loop discrete poles, all inside the unit circle:
@@ -121,10 +128,13 @@ Gain vector (`u = −Kdlqr · [x ẋ θ θ̇]ᵀ`, SI units, angle in radians):
 Kdlqr ≈ [ -0.2045   -1.4142    5.5034    0.4909 ]
 ```
 
-<!-- TODO: add images, for example:
-![Discrete poles on the unit circle](../media/matlab_poles.png)
-![Simulink scope, 10 degree start](../media/simulink_scope_10deg.png)
--->
+<p align="center">
+<img width="1379" height="907" alt="Discrete Closed-Loop Poles" src="https://github.com/user-attachments/assets/447b6bf5-2f48-402e-8aa9-c9c606d626ad" />
+<img width="683" height="375" alt="simulinkblockdiagram" src="https://github.com/user-attachments/assets/1352098c-3014-489e-a4e7-1d10afebad3f" />
+</p>
+<p align = "center">
+<img width="2037" height="1309" alt="10degdisturbance" src="https://github.com/user-attachments/assets/733a5cbb-26e5-4c38-aab7-fc1e96609ddd" />
+</p>
 
 The Simulink runs start tilted at 10°, 20° and 30° with all states returning to zero.
 
@@ -146,7 +156,6 @@ It simulates the **linear** model, so it answers "does the design stabilize the 
 4. `Ts = 0.04` must match the actual control loop period, because the discrete gains depend on it. If the loop runs at a different rate, change `Ts` and re-run the script.
 5. Convert force to motor duty with the motor model (see the firmware README).
 
-<!-- TODO: state the sign convention (which tilt direction is positive θ) so the firmware and model are explicitly consistent. -->
 
 ## Assumptions and limitations
 
