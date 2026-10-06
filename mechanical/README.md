@@ -61,9 +61,11 @@ These values feed directly into the control model. See [`../matlab/README.md`](.
 
 A small 3D-printed jig for calibrating the MPU6050 accelerometer. An accelerometer at rest should read exactly 1 g on whichever axis points along gravity and 0 on the other two, but real boards are off by a small amount per axis. The jig holds the sensor in repeatable, known orientations so the offsets can be measured instead of guessed.
 
-<!-- TODO: add a photo or render of the jig, for example:
-![Calibration jig](../media/calibration_jig.png)
--->
+<p align = "center" >
+
+<img width="501" height="613" alt="image" src="https://github.com/user-attachments/assets/a0a0fdf2-2906-4e33-9bda-41042bb156d7" />
+  
+</p>
 
 ### Why a jig
 
