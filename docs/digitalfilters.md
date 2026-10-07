@@ -1,6 +1,6 @@
 Digital Filters used were IIR Filters integrated into the STM32. 
 
-##First-Order IIR Filter
+##EMA Filter
 
 ```c
 float digitalLowPassFilter(float input, float alpha, float *state) {
