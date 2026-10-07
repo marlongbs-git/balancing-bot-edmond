@@ -1,161 +1,191 @@
-# Digital Filtering used for Edmond
+# Digital Filtering in Edmond
 
-## EMA Filter (First-Order IIR Filter)
+The robot balances by knowing its tilt angle, but neither tilt sensor is good enough on its own. The accelerometer gives a noisy angle that jumps around with every vibration. The gyroscope gives a smooth angular rate, but its angle slowly drifts. Two small digital filters clean this up:
 
-<p align = "center" >
-<img width="795" height="267" alt="image" src="https://github.com/user-attachments/assets/2d574dfa-eebf-415d-9467-0b45868e66a1" />	
+| Filter | What it does | Where it is used |
+|---|---|---|
+| **EMA low-pass** (first-order IIR) | Smooths noisy readings | Each accelerometer axis (α = 0.2) and the gyro rate (α = 0.5) |
+| **Complementary filter** | Blends the accelerometer angle and the gyro rate into one stable pitch | Final pitch estimate used by the controller |
+
+## Contents
+
+- [The pipeline](#the-pipeline)
+- [1. EMA filter (first-order IIR)](#1-ema-filter-first-order-iir)
+- [2. Complementary filter](#2-complementary-filter)
+- [Trade-offs](#trade-offs)
+- [Tuning tips](#tuning-tips)
+- [References](#references)
+
+---
+
+## The pipeline
+
+```mermaid
+flowchart LR
+    A["Accelerometer<br/>x, y, z"] --> B["EMA low-pass<br/>α = 0.2<br/>(each axis)"]
+    B --> C["Pitch angle<br/>atan2(y, √(x² + z²))"]
+    G["Gyro rate<br/>about X"] --> H["EMA low-pass<br/>α = 0.5"]
+    C --> F["Complementary<br/>filter"]
+    H --> F
+    F --> O["Filtered pitch θ<br/>to the controller"]
+```
+
+Pitch will represent the angle at the top of the robot's head relative to the horizontal.
+
+---
+
+## 1. EMA filter (first-order IIR)
+
+<p align="center">
+  <img width="795" height="267" alt="First-order IIR (EMA) filter" src="https://github.com/user-attachments/assets/2d574dfa-eebf-415d-9467-0b45868e66a1" />
 </p>
 
-The first-order EMA filter acts as an exponential moving average that factors in both the current and previous sample and weighs them against one another using the filtering coefficient alpha that is set by the user. This digital filter is a good simple way to implement light filtering and only uses one delay element which is good for my embedded system.
+### The idea
 
+An **exponential moving average (EMA)** keeps a running value and nudges it toward each new sample. Instead of storing the last 10 readings and averaging them, it only remembers **one number**, the previous output. That makes it cheap enough for a small microcontroller.
+
+$$ y[n] = \alpha \, x[n] + (1 - \alpha) \, y[n-1] $$
+
+- `x[n]` is the new sample and `y[n-1]` is the previous filtered output.
+- `α` (alpha) between 0 and 1 sets how much you **trust the new sample**.
+
+It is called a first-order **IIR** (infinite impulse response) filter because the output feeds back into itself. One delay element is all it needs.
+
+### Choosing alpha
+
+| α | Behavior | Result |
+|---|---|---|
+| Close to 1 | Mostly the new sample | Little smoothing, fast response |
+| Close to 0 | Mostly the old output | Heavy smoothing, slow response |
+
+For reference, if the filter runs every 40 ms, α = 0.2 gives a time constant of about 0.18 s, and α = 0.5 about 0.06 s. That is roughly how long the output takes to reach 63% of a sudden step.
+
+
+### Code
 
 ```c
 float digitalLowPassFilter(float input, float alpha, float *state) {
-	//@brief Takes in an input variable and a pointer to a state, stores it and calculates the output filtered value
-	//inputs:  input value, alpha value for adjusting filtering, and pointer to an axis state
-	//outputs: a pointer to the axis state to prevent overwriting issues from previous call
+    // y = alpha * x + (1 - alpha) * y_prev
     *state = alpha * input + (1.0f - alpha) * (*state);
     return *state;
 }
 ```
 
+The `state` pointer holds the previous output. **Each signal needs its own state variable.** The three accelerometer axes use three separate states, so one axis can never overwrite another's history.
+
+### How it is applied to the accelerometer
+
+Each raw axis is filtered, and then the pitch angle is calculated from the filtered values:
+
 ```c
-float mpu6050_getAccelPitchAngle(float AxOffsetError, float AyOffsetError, float AzOffsetError){
-		//@brief takes offset values to calculate accelerometer and gyro pitch, applys complementary filter estimate to output a estimated filter value
-		//inputs: offset values in x,y,z direction for accelerometer and gyro
-		//outputs: filtered pitch estimate
+float alpha = 0.2f;
 
-			uint8_t data_x[2];
-			uint8_t data_y[2];
-			uint8_t data_z[2];
+static float lpfStateXAccel = 0.0f;
+static float lpfStateYAccel = 0.0f;
+static float lpfStateZAccel = 0.0f;
 
+x_accelLSBF = digitalLowPassFilter(x_accelLSB, alpha, &lpfStateXAccel);
+y_accelLSBF = digitalLowPassFilter(y_accelLSB, alpha, &lpfStateYAccel);
+z_accelLSBF = digitalLowPassFilter(z_accelLSB, alpha, &lpfStateZAccel);
 
-			int16_t x_accel;
-			int16_t y_accel;
-			int16_t z_accel;
-
-
-			double x_accelLSB;
-			double y_accelLSB;
-			double z_accelLSB;
-			double SSF = 8192; //Sensitivity Scale Factor on Datasheet LSB/g
-
-			//double anglePitch;
-			static float lastGoodPitchFiltered = 0.0f;
-
-
-			HAL_I2C_Mem_Read(&hi2c1, (DEVICE_ADDRESS << 1) + 1, REG_DATA_ACCELX, 1,data_x, 2, I2C_TIMEOUT_MS);
-			HAL_I2C_Mem_Read(&hi2c1, (DEVICE_ADDRESS << 1) + 1, REG_DATA_ACCELY, 1,data_y, 2, I2C_TIMEOUT_MS);
-			HAL_I2C_Mem_Read(&hi2c1, (DEVICE_ADDRESS << 1) + 1, REG_DATA_ACCELZ, 1,data_z, 2, I2C_TIMEOUT_MS);
-
-
-			//I2C Debugging
-		    static uint16_t consecutiveFailures = 0;
-			HAL_StatusTypeDef status = HAL_I2C_Mem_Read(&hi2c1, (DEVICE_ADDRESS << 1) + 1, REG_DATA_ACCELX, 1, data_x, 2, I2C_TIMEOUT_MS);
-			if (status != HAL_OK) {
-			        uint32_t errorCode = HAL_I2C_GetError(&hi2c1);
-			        sprintf(printstringArcTan, "I2C FAILED status=%d error=0x%lX \r\n", status, errorCode);
-			        HAL_UART_Transmit(&huart2, (uint8_t*)printstringArcTan, strlen(printstringArcTan), 100);
-
-			        if (++consecutiveFailures > 5) {
-			            I2C_BusRecovery();
-			            consecutiveFailures = 0;
-			        }
-			        return lastGoodPitchFiltered;
-			    }
-			    consecutiveFailures = 0;
-
-			x_accel = ((int16_t) data_x[0] << 8) + data_x[1];
-			x_accelLSB = x_accel / SSF;
-			x_accelLSB = x_accelLSB + AxOffsetError;
-			y_accel = ((int16_t) data_y[0] << 8) + data_y[1];
-			y_accelLSB = y_accel / SSF;
-			y_accelLSB = y_accelLSB + AyOffsetError;
-			z_accel = ((int16_t) data_z[0] << 8) + data_z[1];
-			z_accelLSB = z_accel / SSF;
-			z_accelLSB = z_accelLSB + AzOffsetError;
-
-			//sprintf(printstringArcTan, "x_accelLSB: %.3f, y_accelLSB: %.3f, z_accelLSB %.3f \r\n", x_accelLSB, y_accelLSB, z_accelLSB);
-			//HAL_UART_Transmit(&huart2, (uint8_t*)printstringArcTan, strlen(printstringArcTan),100);
-
-
-			//Applying Digital Filtering to measurements (User Defined)
-			float alpha = 0.2;
-
-			double x_accelLSBF;
-			double y_accelLSBF;
-			double z_accelLSBF;
-			double anglePitchFiltered;
-
-			//Storing LPF Outputs
-			static float lpfStateXAccel = 0.0f;
-			static float lpfStateYAccel = 0.0f;
-			static float lpfStateZAccel = 0.0f;
-
-			x_accelLSBF = digitalLowPassFilter(x_accelLSB, alpha, &lpfStateXAccel);
-			y_accelLSBF = digitalLowPassFilter(y_accelLSB, alpha, &lpfStateYAccel);
-			z_accelLSBF = digitalLowPassFilter(z_accelLSB, alpha, &lpfStateZAccel);
-
-			//anglePitch = atan2(y_accelLSB, sqrt((x_accelLSB * x_accelLSB) + (z_accelLSB * z_accelLSB))) * (180 / M_PI);
-			anglePitchFiltered = atan2(y_accelLSBF, sqrt((x_accelLSBF * x_accelLSBF) + (z_accelLSBF * z_accelLSBF))) * (180 / M_PI);
-			lastGoodPitchFiltered = anglePitchFiltered;
-
-			//Printing
-			//sprintf(printstringArcTan, "anglePitch: %.3f, anglePitchFiltered: %.3f \r\n", anglePitch, anglePitchFiltered);
-			//HAL_UART_Transmit(&huart2, (uint8_t*)printstringArcTan, strlen(printstringArcTan),100);
-
-			return lastGoodPitchFiltered;
-}
+anglePitchFiltered = atan2(y_accelLSBF,
+                           sqrt(x_accelLSBF * x_accelLSBF + z_accelLSBF * z_accelLSBF))
+                     * (180 / M_PI);
 ```
 
-The filter is applied on the raw accelerometer dataset and passed a coefficient of alpha = 0.2. We can compare the outputs using a scope. Where pink represents the unfiltered calculation of pitch angle and green is alpha = 0.2
-<p align = "center" >
-<img width="672" height="510" alt="image" src="https://github.com/user-attachments/assets/bc16d9aa-7393-4ad9-b4a9-570ad01623fb" />
+The full function, including the I2C reads and error handling, is in [`firmware/Core/Src/mpu6050.c`](../firmware/Core/Src).
+
+### Result
+
+The plot compares the unfiltered pitch from the accelerometer (**pink**) with the filtered pitch at α = 0.2 (**green**). The filtered trace is visibly smoother, with a small lag behind the raw one.
+
+<p align="center">
+  <img width="672" height="510" alt="Unfiltered pitch (pink) vs filtered pitch with alpha 0.2 (green)" src="https://github.com/user-attachments/assets/bc16d9aa-7393-4ad9-b4a9-570ad01623fb" />
 </p>
 
+---
 
+## 2. Complementary filter
 
+<p align="center">
+  <img width="786" height="311" alt="Complementary filter" src="https://github.com/user-attachments/assets/e3958e32-ab5f-4481-894d-c7d763975e2e" />
+</p>
 
-## Complimentary Filter
+### The problem
 
-<img width="786" height="311" alt="image" src="https://github.com/user-attachments/assets/e3958e32-ab5f-4481-894d-c7d763975e2e" />
+| Sensor | Good at | Bad at |
+|---|---|---|
+| Accelerometer angle | Long-term accuracy. Gravity always points down. | Noisy. Vibration and acceleration corrupt it. |
+| Gyroscope (integrated) | Short-term accuracy. Smooth and responsive. | **Drift.** Small errors add up over time. |
 
+Each one is strong where the other is weak, which is why they are called *complementary*.
+
+### The idea
+
+Use the gyro for fast changes and let the accelerometer slowly pull the result back toward the true angle:
+
+$$ \theta[n] = \alpha \left( \theta[n-1] + \omega \cdot \Delta t \right) + (1 - \alpha) \, \theta_{\text{accel}} $$
+
+- `θ[n-1] + ω·Δt` is the previous angle plus the gyro's rotation since the last step.
+- `θ_accel` is the pitch from the accelerometer.
+- `α` is usually close to 1 (for example 0.95 to 0.99), so the **gyro dominates** over short times and the accelerometer corrects the drift over longer times.
+
+> **Watch the meaning of alpha.** In the EMA filter, α weights the **new sample**. In the complementary filter, α weights the **gyro**. They are different filters with opposite conventions, so values are not interchangeable.
+
+Edmond uses the complementary alpha of 0.95.
+
+### Code
 
 ```c
 float compFilter(float anglePitch, float gyroAngularRate, float alpha) {
-	//@brief takes offset values to calculate accelerometer and gyro pitch, applys complementary filter estimate to output an estimated filter value
-	//inputs: pitch angle, gyro rate, and filtering coeff
-	//outputs: filtered pitch estimate
-		static float compFilterOutput = 0.0f;
-		static float gyroPitchEstimate = 0.0f;
-		static uint32_t getTickOld = 0;
+    static float    compFilterOutput = 0.0f;
+    static uint32_t getTickOld       = 0;
+    static uint8_t  firstRun         = 1;
 
-		//Filter Parameters
-		//float alpha = 0.95f; 	//alpha value to set filter
+    uint32_t currentTick = HAL_GetTick();
+    float dt;
 
-		uint32_t currentTick = HAL_GetTick();
-		float dt = (currentTick - getTickOld) / 1000.0f;
-		getTickOld = currentTick;
-		gyroPitchEstimate = gyroPitchEstimate + gyroAngularRate * dt;
+    if (firstRun) {            // no previous tick yet, so don't integrate
+        dt = 0.0f;
+        firstRun = 0;
+    } else {
+        dt = (currentTick - getTickOld) / 1000.0f;   // seconds
+        if (dt > 0.05f) dt = 0.05f;                  // ignore long gaps
+    }
+    getTickOld = currentTick;
 
-		compFilterOutput = alpha * (compFilterOutput + gyroAngularRate * dt) + (1.0f - alpha) * anglePitch;
+    compFilterOutput = alpha * (compFilterOutput + gyroAngularRate * dt)
+                     + (1.0f - alpha) * anglePitch;
 
-		//sprintf(printstring3, "AccPitch: %.3f, GyPitchEst: %.3f, CompF: %.3f \r\n", anglePitch, gyroPitchEstimate, compFilterOutput);
-		//HAL_UART_Transmit(&huart2, (uint8_t*) printstring3, strlen(printstring3), 100);
-
-		return compFilterOutput;
-
+    return compFilterOutput;
 }
 ```
 
-## Drawbacks
-The more filtering incorportated into the system adds delays in computation as it will stray further from the real data. This is dependent on the speed of the overall control loop and the communication or way data is transmitted/handled coming from the sensor. In my specific use case, this is fine as the system is still operational however, for more advanced systems filtering can be tuned for the specific application using various optimization techniques in MATLAB.
+Two small guards matter in practice:
 
-## Refrences
+- **First call.** Without it, `dt` is computed from a tick counter that starts at 0, so the first integration step is huge and the angle starts far from zero.
+- **`dt` clamp.** If the loop stalls (an I2C retry, for example), a long `dt` would add a large jump to the angle.
 
-Phils Lab *The Simplest Digital Filter (STM32 Implementation) - Phil's Lab #92*
-Phils Lab *Complementary Filter - Sensor Fusion #2 - Phil's Lab #34*
-Phils Lab *IIR Filters - Theory and Implementation (STM32) - Phil's Lab #32*
+---
 
+## Trade-offs
 
+Every filter adds **delay**. The more smoothing, the further the filtered value lags behind the real motion. For a balancing robot, that lag works against the controller, which needs to react quickly to tilt.
+
+How much delay is acceptable depends on the control loop speed and how the sensor data is read and passed along. For Edmond, the lag is small enough that the robot balances. A faster or more demanding system would need the filters tuned for its specific case, for example by optimizing them in MATLAB.
+
+Edmond's choice is also deliberately simple: two light filters that need almost no memory or computing time on the STM32.
+
+## Tuning tips
+
+1. **Change one alpha at a time** and compare the plots against the unfiltered signal.
+2. **Too much smoothing** shows up as slow recovery and oscillation. **Too little** shows up as jitter in the motors.
+3. **Stack filters carefully.** The accelerometer here is smoothed by the EMA *and* then the complementary filter, which also low-passes it. If the response feels sluggish, try less smoothing on the accelerometer first.
+4. **Seed the EMA state** with the first sample, not 0, to avoid a short ramp-up at startup.
+
+## References
+
+- Phil's Lab, *The Simplest Digital Filter (STM32 Implementation), Phil's Lab #92*  
+- Phil's Lab, *Complementary Filter - Sensor Fusion #2, Phil's Lab #34* 
+- Phil's Lab, *IIR Filters - Theory and Implementation (STM32), Phil's Lab #32* 
 
