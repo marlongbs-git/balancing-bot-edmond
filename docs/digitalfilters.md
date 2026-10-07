@@ -2,7 +2,7 @@
 
 --
 
-##EMA Filter (First-Order IIR Filter)
+## EMA Filter (First-Order IIR Filter)
 
 
 <img width="795" height="267" alt="image" src="https://github.com/user-attachments/assets/2d574dfa-eebf-415d-9467-0b45868e66a1" />
@@ -19,7 +19,7 @@ float digitalLowPassFilter(float input, float alpha, float *state) {
 ```
 --
 
-##Complimentary Filter
+## Complimentary Filter
 
 ```c
 float compFilter(float anglePitch, float gyroAngularRate, float alpha) {
@@ -49,11 +49,10 @@ float compFilter(float anglePitch, float gyroAngularRate, float alpha) {
 ```
 --
 
-##Refrences
-
+## Refrences
 
 Phils Lab *The Simplest Digital Filter (STM32 Implementation) - Phil's Lab #92*
-Phils Lab *(Sponsored) Complementary Filter - Sensor Fusion #2 - Phil's Lab #34*
+Phils Lab *Complementary Filter - Sensor Fusion #2 - Phil's Lab #34*
 
 
 
