@@ -119,6 +119,7 @@ STEP and STL exports are in [`mechanical/`](mechanical/).
 - [x] Fall detection with OLED face
 - [ ] Extended Kalman filter for attitude estimation
 - [ ] Battery power
+- [ ] Custom Motor Driver and PCB to replace perfboard
 
 ## Credits
 
