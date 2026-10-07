@@ -185,7 +185,7 @@ Edmond's choice is also deliberately simple: two light filters that need almost 
 
 ## References
 
-- Phil's Lab, *The Simplest Digital Filter (STM32 Implementation), Phil's Lab #92*  
-- Phil's Lab, *Complementary Filter - Sensor Fusion #2, Phil's Lab #34* 
-- Phil's Lab, *IIR Filters - Theory and Implementation (STM32), Phil's Lab #32* 
+- Phil's Lab, [*The Simplest Digital Filter (STM32 Implementation), Phil's Lab #92*](https://www.youtube.com/watch?v=1e_ZB8p5n6s)
+- Phil's Lab, [*Complementary Filter - Sensor Fusion #2, Phil's Lab #34*](https://www.youtube.com/watch?v=BUW2OdAtzBw&xstg=CAMSEBUJ_b-oH-PhF0yjBgaukzY%3D)
+- Phil's Lab, [*IIR Filters - Theory and Implementation (STM32), Phil's Lab #32*](https://www.youtube.com/watch?v=QRMe02kzVkA&xstg=CAMSEBUJ_b-oH-PhF0yjBgaukzY%3D)
 
