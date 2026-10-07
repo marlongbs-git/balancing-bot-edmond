@@ -42,4 +42,10 @@ float compFilter(float anglePitch, float gyroAngularRate, float alpha) {
 }
 ```
 
+##Refrences
+
+
+Phils Lab *The Simplest Digital Filter (STM32 Implementation) - Phil's Lab #92*
+
+
 
