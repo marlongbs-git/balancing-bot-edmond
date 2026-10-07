@@ -107,7 +107,7 @@ No. The calibration only needs to be done once per sensor. After running it, the
 
 ### Files and print notes
 
-- STEP and STL: `calibration_jig.step`, `calibration_jig.stl`
+- STL: `robotcalibrationjig.stl`
 
 ## Assembly notes
 
