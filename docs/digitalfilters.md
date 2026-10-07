@@ -1,6 +1,4 @@
-# Digital filters used were IIR Filters integrated into the STM32. 
-
-
+# Digital Filtering used for Edmond
 
 ## EMA Filter (First-Order IIR Filter)
 
@@ -120,6 +118,9 @@ The filter is applied on the raw accelerometer dataset and passed a coefficient 
 
 ## Complimentary Filter
 
+<img width="786" height="311" alt="image" src="https://github.com/user-attachments/assets/e3958e32-ab5f-4481-894d-c7d763975e2e" />
+
+
 ```c
 float compFilter(float anglePitch, float gyroAngularRate, float alpha) {
 	//@brief takes offset values to calculate accelerometer and gyro pitch, applys complementary filter estimate to output an estimated filter value
@@ -147,6 +148,8 @@ float compFilter(float anglePitch, float gyroAngularRate, float alpha) {
 }
 ```
 
+## Drawbacks
+The more filtering incorportated into the system adds delays in computation as it will stray further from the real data. This is dependent on the speed of the overall control loop and the communication or way data is transmitted/handled coming from the sensor. In my specific use case, this is fine as the system is still operational however, for more advanced systems filtering can be tuned for the specific application using various optimization techniques in MATLAB.
 
 ## Refrences
 
