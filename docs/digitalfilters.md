@@ -22,7 +22,7 @@ float digitalLowPassFilter(float input, float alpha, float *state) {
 ```c
 float compFilter(float anglePitch, float gyroAngularRate, float alpha) {
 	//@brief takes offset values to calculate accelerometer and gyro pitch, applys complementary filter estimate to output a estimated filter value
-	//inputs: offset values in x,y,z direction for accelerometer and gyro
+	//inputs: pitch angle, gyro rate, and filtering coeff
 	//outputs: filtered pitch estimate
 		static float compFilterOutput = 0.0f;
 		static float gyroPitchEstimate = 0.0f;
