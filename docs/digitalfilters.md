@@ -21,6 +21,9 @@ float digitalLowPassFilter(float input, float alpha, float *state) {
 }
 ```
 
+<p align = "center" >
+<img width="672" height="510" alt="image" src="https://github.com/user-attachments/assets/bc16d9aa-7393-4ad9-b4a9-570ad01623fb" />
+</p>
 
 ## Complimentary Filter
 
