@@ -30,7 +30,7 @@ flowchart LR
     F --> O["Filtered pitch θ<br/>to the controller"]
 ```
 
-Pitch will represent the angle at the top of the robot's head relative to the horizontal.
+Pitch represents the angle of the top of the robot's head relative to the horizontal.
 
 ---
 
