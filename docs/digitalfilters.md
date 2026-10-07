@@ -1,4 +1,6 @@
-Digital Filters used were IIR Filters integrated into the STM32. 
+# Digital filters used were IIR Filters integrated into the STM32. 
+
+--
 
 ##EMA Filter (First-Order IIR Filter)
 
@@ -15,7 +17,7 @@ float digitalLowPassFilter(float input, float alpha, float *state) {
     return *state;
 }
 ```
-
+--
 
 ##Complimentary Filter
 
@@ -45,6 +47,7 @@ float compFilter(float anglePitch, float gyroAngularRate, float alpha) {
 
 }
 ```
+--
 
 ##Refrences
 
