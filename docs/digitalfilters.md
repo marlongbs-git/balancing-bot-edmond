@@ -1,6 +1,10 @@
 Digital Filters used were IIR Filters integrated into the STM32. 
 
-##EMA Filter
+##EMA Filter (First-Order IIR Filter)
+
+
+<img width="795" height="267" alt="image" src="https://github.com/user-attachments/assets/2d574dfa-eebf-415d-9467-0b45868e66a1" />
+
 
 ```c
 float digitalLowPassFilter(float input, float alpha, float *state) {
