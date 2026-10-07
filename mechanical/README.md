@@ -65,6 +65,8 @@ A small 3D-printed jig for calibrating the MPU6050 accelerometer. An acceleromet
 <p align = "center" >
 
 <img width="501" height="613" alt="image" src="https://github.com/user-attachments/assets/a0a0fdf2-2906-4e33-9bda-41042bb156d7" />
+<img width="479" height="564" alt="Screenshot 2026-09-25 103139" src="https://github.com/user-attachments/assets/a06a5d03-7fb0-466b-b498-1a2959ea46e0" />
+
   
 </p>
 
